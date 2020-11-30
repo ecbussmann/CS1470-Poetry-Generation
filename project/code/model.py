@@ -62,3 +62,20 @@ class Model(tf.keras.Model):
         dense_outputs = self.dense_layer2(decoder_output)
 
         return tf.nn.softmax(dense_outputs)
+
+
+    def loss_function(self, prbs, labels, mask):
+    """
+    Calculates the total model cross-entropy loss after one forward pass.
+
+    :param prbs:  float tensor, word prediction probabilities [batch_size x window_size x vocab_size]
+    :param labels:  integer tensor, word prediction labels [batch_size x window_size]
+    :param mask:  tensor that acts as a padding mask [batch_size x window_size]
+    :return: the loss of the model as a tensor
+    """
+
+    loss = tf.keras.losses.sparse_categorical_crossentropy(
+        labels, prbs, from_logits=False)
+    loss_with_mask = loss * mask
+
+    return tf.math.reduce_sum(loss_with_mask)
