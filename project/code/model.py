@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from attention import Attention
 
 class GRU_Model(tf.keras.Model):
     def __init__(self, vocab_size):
@@ -12,8 +13,8 @@ class GRU_Model(tf.keras.Model):
         self.embed_st_dev = 0.01
 
         # Define batch size and optimizer/learning rate
-        self.batch_size = 100 # You can change this
-        self.embedding_size = 100
+        self.batch_size = 100
+        self.embedding_size = 102
         self.learning_rate = 0.01
         self.optimizer = tf.keras.optimizers.Adam(
             learning_rate=self.learning_rate)
@@ -26,6 +27,7 @@ class GRU_Model(tf.keras.Model):
             self.encoder_decoder_size, return_sequences=True, return_state=True)
         self.decoder = tf.keras.layers.GRU(
             self.encoder_decoder_size, return_sequences=True, return_state=True)
+        self.attention_layer = Attention(self.encoder_decoder_size)
 
     @tf.function
     def call(self, encoder_input, decoder_input):
