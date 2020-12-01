@@ -1,17 +1,16 @@
 import numpy as np
 import tensorflow as tf
+import re
 
 #from attenvis import AttentionVis
 #av = AttentionVis()
 
-##########DO NOT CHANGE#####################
 PAD_TOKEN = "*PAD*"
 STOP_TOKEN = "*STOP*"
 START_TOKEN = "*START*"
 UNK_TOKEN = "*UNK*"
 WINDOW_SIZE = 20
 
-##########DO NOT CHANGE#####################
 
 def pad_corpus(inputs, labels):
     """
@@ -33,8 +32,8 @@ def pad_corpus(inputs, labels):
     OUTPUT_padded_sentences = []
     for line in labels:
         padded_OUTPUTS = line[:WINDOW_SIZE]
-        padded_OUTPUTS = [START_TOKEN] + padded_OUTPUTS + [STOP_TOKEN] + [PAD_TOKEN] * (WINDOW_SIZE - len(padded_OUPUTS)-1)
-        OUTPUT_padded_sentences.append(padded_OUTPUT)
+        padded_OUTPUTS = [START_TOKEN] + padded_OUTPUTS + [STOP_TOKEN] + [PAD_TOKEN] * (WINDOW_SIZE - len(padded_OUTPUTS)-1)
+        OUTPUT_padded_sentences.append(padded_OUTPUTS)
 
     return INPUT_padded_sentences, OUTPUT_padded_sentences
 
@@ -93,8 +92,6 @@ def read_data(file_name):
 
 #@av.get_data_func
 def get_data(wiki_file):
-
-
     new_list = []
     sentences = read_data(wiki_file)
     for x in sentences:
@@ -109,7 +106,7 @@ def get_data(wiki_file):
     inputs_padded, labels_padded = pad_corpus(inputs, labels)
     dict, pad = build_vocab(inputs_padded)
 
-    inputs = build_vocab(dict, inputs_padded)
-    labels = build_vocab(dict, labels_padded)
+    inputs = convert_to_id(dict, inputs_padded)
+    labels = convert_to_id(dict, labels_padded)
 
-    return inputs, labels, pad
+    return inputs, labels, pad, dict

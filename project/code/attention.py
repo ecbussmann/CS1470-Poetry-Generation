@@ -14,7 +14,7 @@ class Attention(tf.keras.layers.Layer):
     def call(self, hidden_dec, hidden_enc):
         # Comment the input and output!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         hidden_dec_transposed = tf.transpose(hidden_dec)
-        score = hidden_dec_transposed * self.dense_layer(hidden_enc)
+        score = tf.matmul(hidden_dec_transposed, self.dense_layer(hidden_enc))
 
         attention_weights = tf.nn.softmax(score) # axis ????????????????????????????????????
 

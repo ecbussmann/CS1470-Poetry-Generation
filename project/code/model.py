@@ -47,7 +47,7 @@ class Model(tf.keras.Model):
             encoder_embeddings, initial_state=None)
 
         # Use general attention
-        context = self.attention(encoder_final_state, encoder_output)
+        context = self.attention_layer(encoder_final_state, encoder_output)
         context_hidden_concat = tf.concat([context, encoder_final_state], axis=-1) # axis?
         hidden_with_attention = self.dense_layer1(context_hidden_concat)
 
@@ -65,17 +65,17 @@ class Model(tf.keras.Model):
 
 
     def loss_function(self, prbs, labels, mask):
-    """
-    Calculates the total model cross-entropy loss after one forward pass.
+        """
+        Calculates the total model cross-entropy loss after one forward pass.
 
-    :param prbs:  float tensor, word prediction probabilities [batch_size x window_size x vocab_size]
-    :param labels:  integer tensor, word prediction labels [batch_size x window_size]
-    :param mask:  tensor that acts as a padding mask [batch_size x window_size]
-    :return: the loss of the model as a tensor
-    """
+        :param prbs:  float tensor, word prediction probabilities [batch_size x window_size x vocab_size]
+        :param labels:  integer tensor, word prediction labels [batch_size x window_size]
+        :param mask:  tensor that acts as a padding mask [batch_size x window_size]
+        :return: the loss of the model as a tensor
+        """
 
-    loss = tf.keras.losses.sparse_categorical_crossentropy(
-        labels, prbs, from_logits=False)
-    loss_with_mask = loss * mask
+        loss = tf.keras.losses.sparse_categorical_crossentropy(
+            labels, prbs, from_logits=False)
+        loss_with_mask = loss * mask
 
-    return tf.math.reduce_sum(loss_with_mask)
+        return tf.math.reduce_sum(loss_with_mask)
