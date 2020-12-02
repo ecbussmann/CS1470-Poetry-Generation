@@ -25,13 +25,13 @@ def pad_corpus(inputs, labels):
     """
     INPUT_padded_sentences = []
     for line in inputs:
-        padded_INPUTS = line[:WINDOW_SIZE]
+        padded_INPUTS = line[:WINDOW_SIZE-1]
         padded_INPUTS += [STOP_TOKEN] + [PAD_TOKEN] * (WINDOW_SIZE - len(padded_INPUTS)-1)
         INPUT_padded_sentences.append(padded_INPUTS)
 
     OUTPUT_padded_sentences = []
     for line in labels:
-        padded_OUTPUTS = line[:WINDOW_SIZE]
+        padded_OUTPUTS = line[:WINDOW_SIZE-1]
         padded_OUTPUTS = [START_TOKEN] + padded_OUTPUTS + [STOP_TOKEN] + [PAD_TOKEN] * (WINDOW_SIZE - len(padded_OUTPUTS)-1)
         OUTPUT_padded_sentences.append(padded_OUTPUTS)
 
@@ -53,6 +53,7 @@ def build_vocab(sentences):
     vocab =  {word:i for i,word in enumerate(all_words)}
 
     return vocab,vocab[PAD_TOKEN]
+
 
 def convert_to_id(vocab, sentences):
     """
@@ -80,17 +81,22 @@ def read_data(file_name):
     with open(file_name, 'rt', encoding='latin') as data_file:
         text = data_file.read().strip()
         text = text.lower()
-        text = re.sub('\n', '', text)
-        text = re.sub('= .* =', '', text)
-        text = re.split('. | ! | ? ', text)
+        text = re.sub('\n = .* = \n', '', text)
+        text = text.replace('\n', '')
+        text = text.replace('!', '.')
+        text = text = text.replace('?', '.')
+        text = text.split('.')
 
         sentences = []
         for sentence in text:
-            sentences.append(sentence.split())
+            stripped_sentence = sentence.strip()
+
+            if (stripped_sentence != ""):
+                sentences.append(sentence.strip().split())
 
     return sentences
 
-#@av.get_data_func
+
 def get_data(wiki_file):
     new_list = []
     sentences = read_data(wiki_file)

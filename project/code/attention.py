@@ -13,12 +13,23 @@ class Attention(tf.keras.layers.Layer):
 
     def call(self, hidden_dec, hidden_enc):
         # Comment the input and output!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        #hidden_dec_expanded = tf.expand_dims(hidden_dec, 1)
         hidden_dec_transposed = tf.transpose(hidden_dec)
-        score = tf.matmul(hidden_dec_transposed, self.dense_layer(hidden_enc))
+        dense_output = self.dense_layer(hidden_enc)
+        dense_output = tf.reshape(dense_output, (dense_output.shape[0], -1))
+        score = tf.matmul(hidden_dec_transposed, dense_output)
+        score = tf.reshape(score, (-1, 20, 1))
+        score = tf.squeeze(score)
 
-        attention_weights = tf.nn.softmax(score) # axis ????????????????????????????????????
+        print("score shape")
+        print(score.shape)
 
-        context = attention_weights * hidden_enc
+        attention_weights = tf.nn.softmax(score, axis=1) # axis ????????????????????????????????????
+
+        context = tf.matmul(attention_weights, hidden_enc) # [150,20,150], [100,20,150].
         context = tf.reduce_sum(context, axis=1)
+
+        print("context vector shape")
+        print(context.shape)
 
         return context

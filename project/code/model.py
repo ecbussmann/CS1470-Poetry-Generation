@@ -9,7 +9,7 @@ class Model(tf.keras.Model):
         self.vocab_size = vocab_size
 
         # Define hyperparameters
-        self.encoder_decoder_size = 40
+        self.encoder_decoder_size = 150  #40
         self.embed_st_dev = 0.01
 
         # Define batch size and optimizer/learning rate
@@ -33,7 +33,6 @@ class Model(tf.keras.Model):
         self.dense_layer2 = tf.keras.layers.Dense(
             self.vocab_size, activation=None, dtype=tf.float32)
 
-    @tf.function
     def call(self, encoder_input, decoder_input):
         """
         :param encoder_input: batched ids corresponding to input sentences
@@ -47,16 +46,16 @@ class Model(tf.keras.Model):
             encoder_embeddings, initial_state=None)
 
         # Use general attention
-        context = self.attention_layer(encoder_final_state, encoder_output)
-        context_hidden_concat = tf.concat([context, encoder_final_state], axis=-1) # axis?
-        hidden_with_attention = self.dense_layer1(context_hidden_concat)
+        #context = self.attention_layer(encoder_final_state, encoder_output)
+        #context_hidden_concat = tf.concat([context, encoder_final_state], axis=-1) # axis? #~!!!!!!!!!!
+        #hidden_with_attention = self.dense_layer1(context_hidden_concat)
 
         # Pass decoder embeddings and attention enhanced hidden state to decoder
         decoder_embeddings = tf.nn.embedding_lookup(
             self.embeddings, decoder_input)
         decoder_output, decoder_final_state = self.decoder(
             decoder_embeddings,
-            initial_state=hidden_with_attention)
+            initial_state=encoder_final_state) #hidden_with_attention
 
         # Apply dense layer to the decoder out to generate probabilities
         dense_outputs = self.dense_layer2(decoder_output)
@@ -73,7 +72,6 @@ class Model(tf.keras.Model):
         :param mask:  tensor that acts as a padding mask [batch_size x window_size]
         :return: the loss of the model as a tensor
         """
-
         loss = tf.keras.losses.sparse_categorical_crossentropy(
             labels, prbs, from_logits=False)
         loss_with_mask = loss * mask
