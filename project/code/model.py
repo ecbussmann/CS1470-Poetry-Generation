@@ -46,9 +46,9 @@ class Model(tf.keras.Model):
             encoder_embeddings, initial_state=None)
 
         # Use general attention
-        #context = self.attention_layer(encoder_final_state, encoder_output)
-        #context_hidden_concat = tf.concat([context, encoder_final_state], axis=-1) # axis? #~!!!!!!!!!!
-        #hidden_with_attention = self.dense_layer1(context_hidden_concat)
+        context = self.attention_layer(encoder_final_state, encoder_output)
+        context_hidden_concat = tf.concat([context, encoder_final_state], axis=-1) # axis? #~!!!!!!!!!!
+        hidden_with_attention = self.dense_layer1(context_hidden_concat)
 
         # Pass decoder embeddings and attention enhanced hidden state to decoder
         decoder_embeddings = tf.nn.embedding_lookup(

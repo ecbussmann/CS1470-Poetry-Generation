@@ -77,7 +77,9 @@ def main():
     model = Model(len(dict))
     train(model, inputs, labels, padding_index)
 
-    sentence = ["He", "wrote", "eighteen", "poems", "on", "painting", "alone", "more", "than", "any", "other", "Tang", "poet"]
+    sentence = ["He", "wrote", "eighteen", "poems", "on", "painting", \
+        "alone", "more", "than", "any", "other", "Tang", "poet", "*STOP*", \
+        "*PAD*", "*PAD*", "*PAD*", "*PAD*", "*PAD*", "*PAD*"]
 
     generate_sentence(sentence, dict, model)
 

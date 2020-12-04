@@ -18,18 +18,12 @@ class Attention(tf.keras.layers.Layer):
         dense_output = self.dense_layer(hidden_enc)
         dense_output = tf.reshape(dense_output, (dense_output.shape[0], -1))
         score = tf.matmul(hidden_dec_transposed, dense_output)
-        score = tf.reshape(score, (-1, 20, 1))
+        score = tf.reshape(score, (-1, hidden_enc.shape[1], 1))
         score = tf.squeeze(score)
-
-        print("score shape")
-        print(score.shape)
 
         attention_weights = tf.nn.softmax(score, axis=1) # axis ????????????????????????????????????
 
-        context = tf.matmul(attention_weights, hidden_enc) # [150,20,150], [100,20,150].
+        context = tf.matmul(attention_weights, hidden_enc)
         context = tf.reduce_sum(context, axis=1)
-
-        print("context vector shape")
-        print(context.shape)
 
         return context
