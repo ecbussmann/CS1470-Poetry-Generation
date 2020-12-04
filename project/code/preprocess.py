@@ -70,8 +70,6 @@ def convert_to_id(vocab, sentences):
 
 def read_data(file_name):
     """
-    DO NOT CHANGE
-
   Load text data from file
 
     :param file_name:  string, name of data file
@@ -97,22 +95,40 @@ def read_data(file_name):
     return sentences
 
 
-def get_data(wiki_file):
-    new_list = []
-    sentences = read_data(wiki_file)
-    for x in sentences:
+def get_data(train_file, test_file):
+    # organizing the training data
+    train_reversed_sentences = []
+    train_sentences = read_data(train_file)
+    for x in train_sentences:
         x2 = x.copy()
         x2.reverse()
-        new_list.append(x2)
+        train_reversed_sentences.append(x2)
+
+    train_inputs = train_sentences[:-1]
+    train_labels = train_reversed_sentences[1:]
+
+    train_inputs_padded, train_labels_padded = pad_corpus(train_inputs, train_labels)
+    dict, pad = build_vocab(train_inputs_padded)
+    dict[start_token] = len(dict)
+
+    train_inputs = convert_to_id(dict, train_inputs_padded)
+    train_labels = convert_to_id(dict, train_labels_padded)
 
 
-    inputs = sentences[:-1]
-    labels = new_list[1:]
+    # organizing the testing data
+    test_reversed_sentences = []
+    test_sentences = read_data(test_file)
+    for x in test_sentences:
+        x2 = x.copy()
+        x2.reverse()
+        test_reversed_sentences.append(x2)
 
-    inputs_padded, labels_padded = pad_corpus(inputs, labels)
-    dict, pad = build_vocab(inputs_padded)
+    test_inputs = test_sentences[:-1]
+    test_labels = test_reversed_sentences[1:]
 
-    inputs = convert_to_id(dict, inputs_padded)
-    labels = convert_to_id(dict, labels_padded)
+    test_inputs_padded, test_labels_padded = pad_corpus(test_inputs, test_labels)
 
-    return inputs, labels, pad, dict
+    test_inputs = convert_to_id(dict, test_inputs_padded)
+    test_labels = convert_to_id(dict, test_labels_padded)
+
+    return train_inputs, train_labels, test_inputs, test_labels, pad, dict

@@ -14,7 +14,7 @@ class Model(tf.keras.Model):
 
         # Define batch size and optimizer/learning rate
         self.batch_size = 100
-        self.embedding_size = 102
+        self.embedding_size = 140 #102
         self.learning_rate = 0.01
         self.optimizer = tf.keras.optimizers.Adam(
             learning_rate=self.learning_rate)
@@ -55,7 +55,7 @@ class Model(tf.keras.Model):
             self.embeddings, decoder_input)
         decoder_output, decoder_final_state = self.decoder(
             decoder_embeddings,
-            initial_state=encoder_final_state) #hidden_with_attention
+            initial_state=hidden_with_attention) #encoder_final_state)
 
         # Apply dense layer to the decoder out to generate probabilities
         dense_outputs = self.dense_layer2(decoder_output)
@@ -77,3 +77,17 @@ class Model(tf.keras.Model):
         loss_with_mask = loss * mask
 
         return tf.math.reduce_sum(loss_with_mask)
+
+
+    def accuracy_function(self, prbs, labels, mask):
+        """
+        Computes the batch accuracy
+
+        :param prbs:  float tensor, word prediction probabilities [batch_size x window_size x vocab_size]
+        :param labels:  integer tensor, word prediction labels [batch_size x window_size]
+        :param mask:  tensor that acts as a padding mask [batch_size x window_size]
+        :return: scalar tensor of accuracy of the batch between 0 and 1
+        """
+        decoded_symbols = tf.argmax(input=prbs, axis=2)
+        accuracy = tf.reduce_mean(tf.boolean_mask(tf.cast(tf.equal(decoded_symbols, labels), dtype=tf.float32),mask))
+        return accuracy
