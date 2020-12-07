@@ -9,7 +9,7 @@ PAD_TOKEN = "*PAD*"
 STOP_TOKEN = "*STOP*"
 START_TOKEN = "*START*"
 UNK_TOKEN = "*UNK*"
-WINDOW_SIZE = 20
+WINDOW_SIZE = 10 #20
 
 
 def pad_corpus(inputs, labels):
@@ -109,7 +109,7 @@ def get_data(train_file, test_file):
 
     train_inputs_padded, train_labels_padded = pad_corpus(train_inputs, train_labels)
     dict, pad = build_vocab(train_inputs_padded)
-    dict[start_token] = len(dict)
+    dict[START_TOKEN] = len(dict)
 
     train_inputs = convert_to_id(dict, train_inputs_padded)
     train_labels = convert_to_id(dict, train_labels_padded)

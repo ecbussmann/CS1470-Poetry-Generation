@@ -100,11 +100,15 @@ def generate_sentence(sentence, vocab, model, sample_n=10):
     sentence_logits = tf.squeeze(sentence_logits)
     output_sentece = []
 
-    print("sentence_logits shape")
-    print(sentence_logits.shape)
-
     for word_logits in sentence_logits:
-        out_index = np.argsort(word_logits)[len(word_logits) - 1]
+        #out_index = np.argsort(word_logits)[len(word_logits) - 1]
+        np_word_logits = word_logits.numpy()
+        top_n = np.argsort(np_word_logits)[-sample_n:]
+        n_logits = np.exp(np_word_logits[top_n])/np.exp(np_word_logits[top_n]).sum()
+
+        out_index = np.random.choice(top_n,p=n_logits)
+
+
         output_sentece.append(reverse_vocab[out_index])
 
     print(" ".join(output_sentece))
@@ -113,7 +117,8 @@ def generate_sentence(sentence, vocab, model, sample_n=10):
 
 def main():
     train_inputs, train_labels, test_inputs, test_labels, padding_index, dict =\
-        get_data("../../data/wiki.train.tokens", "../../data/wiki.test.tokens")
+        get_data("../../data/train.txt", "../../data/test.txt")
+
 
     model = Model(len(dict))
     train(model, train_inputs, train_labels, padding_index)
@@ -125,8 +130,8 @@ def main():
     print("accuracy: ")
     print(accuracy)
 
-    sentence = ["He", "wrote", "eighteen", "poems", "on", "painting", \
-        "alone", "more", "than", "any", "other", "Tang", "poet", "*STOP*", \
+    sentence = ["he", "wrote", "eighteen", "poems", "on", "painting", \
+        "alone", "more", "than", "any", "other", "tang", "poet", "*STOP*", \
         "*PAD*", "*PAD*", "*PAD*", "*PAD*", "*PAD*", "*PAD*"]
 
     generate_sentence(sentence, dict, model)
