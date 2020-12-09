@@ -2,19 +2,15 @@ import numpy as np
 import tensorflow as tf
 import re
 
-#from attenvis import AttentionVis
-#av = AttentionVis()
-
 PAD_TOKEN = "*PAD*"
 STOP_TOKEN = "*STOP*"
 START_TOKEN = "*START*"
 UNK_TOKEN = "*UNK*"
-WINDOW_SIZE = 10 #20
+WINDOW_SIZE = 10
 
 
 def pad_corpus(inputs, labels):
     """
-
     arguments are lists of input, label sentences. The
     text is given an initial "*STOP*".  All sentences are padded with "*STOP*" at
     the end.
@@ -26,21 +22,21 @@ def pad_corpus(inputs, labels):
     INPUT_padded_sentences = []
     for line in inputs:
         padded_INPUTS = line[:WINDOW_SIZE-1]
-        padded_INPUTS += [STOP_TOKEN] + [PAD_TOKEN] * (WINDOW_SIZE - len(padded_INPUTS)-1)
+        padded_INPUTS += [STOP_TOKEN] + [PAD_TOKEN] * (WINDOW_SIZE - \
+            len(padded_INPUTS)-1)
         INPUT_padded_sentences.append(padded_INPUTS)
 
     OUTPUT_padded_sentences = []
     for line in labels:
         padded_OUTPUTS = line[:WINDOW_SIZE-1]
-        padded_OUTPUTS = [START_TOKEN] + padded_OUTPUTS + [STOP_TOKEN] + [PAD_TOKEN] * (WINDOW_SIZE - len(padded_OUTPUTS)-1)
+        padded_OUTPUTS = [START_TOKEN] + padded_OUTPUTS + [STOP_TOKEN] + \
+            [PAD_TOKEN] * (WINDOW_SIZE - len(padded_OUTPUTS)-1)
         OUTPUT_padded_sentences.append(padded_OUTPUTS)
 
     return INPUT_padded_sentences, OUTPUT_padded_sentences
 
 def build_vocab(sentences):
     """
-
-
   Builds vocab from list of sentences
 
     :param sentences:  list of sentences, each a list of words
@@ -57,30 +53,28 @@ def build_vocab(sentences):
 
 def convert_to_id(vocab, sentences):
     """
-    DO NOT CHANGE
-
-  Convert sentences to indexed
+    Convert sentences to indexed
 
     :param vocab:  dictionary, word --> unique index
     :param sentences:  list of lists of words, each representing padded sentence
     :return: numpy array of integers, with each row representing the word indeces in the corresponding sentences
-  """
+    """
     return np.stack([[vocab[word] if word in vocab else vocab[UNK_TOKEN] for word in sentence] for sentence in sentences])
 
 
 def read_data(file_name):
     """
-  Load text data from file
+    Load text data from file
 
     :param file_name:  string, name of data file
     :return: list of sentences, each a list of words split on whitespace
-  """
+    """
     text = []
     with open(file_name, 'rt', encoding='latin') as data_file:
         text = data_file.read().strip()
         text = text.lower()
         text = re.sub('\n = .* = \n', '', text)
-        text = text.replace('\n', '')
+        text = text.replace('\n', ' ')
         text = text.replace('!', '.')
         text = text = text.replace('?', '.')
         text = text.split('.')
@@ -96,11 +90,26 @@ def read_data(file_name):
 
 
 def get_data(train_file, test_file):
-    # organizing the training data
+    """
+    Get the testing and training data from the files and preprocess it.
+
+    :param train_file:  string, name of the training file
+    :param test_file:  string, name of the testing file
+    :return: A tuple of:
+        (list of training padded input sentences that consist of ids,
+        list of training padded output sentences that consist of ids,
+        list of testing padded input sentences that consist of ids,
+        list of testing padded output sentences that consist of ids,
+        the id of the padding token,
+        a dictionary from words (Strings) to ids (integers))
+    """
+    # Reading and organizing the training data
     train_reversed_sentences = []
     train_sentences = read_data(train_file)
     for x in train_sentences:
         x2 = x.copy()
+
+        # Reverse the output sentences so a rhyme scheme could be added if desired
         x2.reverse()
         train_reversed_sentences.append(x2)
 
@@ -115,7 +124,7 @@ def get_data(train_file, test_file):
     train_labels = convert_to_id(dict, train_labels_padded)
 
 
-    # organizing the testing data
+    # Reading and organizing the testing data
     test_reversed_sentences = []
     test_sentences = read_data(test_file)
     for x in test_sentences:

@@ -9,12 +9,12 @@ class Model(tf.keras.Model):
         self.vocab_size = vocab_size
 
         # Define hyperparameters
-        self.encoder_decoder_size = 150  #40
+        self.encoder_decoder_size = 150
         self.embed_st_dev = 0.01
 
         # Define batch size and optimizer/learning rate
         self.batch_size = 100
-        self.embedding_size = 140 #102
+        self.embedding_size = 140
         self.learning_rate = 0.01
         self.optimizer = tf.keras.optimizers.Adam(
             learning_rate=self.learning_rate)
@@ -89,5 +89,7 @@ class Model(tf.keras.Model):
         :return: scalar tensor of accuracy of the batch between 0 and 1
         """
         decoded_symbols = tf.argmax(input=prbs, axis=2)
-        accuracy = tf.reduce_mean(tf.boolean_mask(tf.cast(tf.equal(decoded_symbols, labels), dtype=tf.float32),mask))
+        accuracy = tf.reduce_mean(tf.boolean_mask(tf.cast(
+            tf.equal(decoded_symbols, labels), dtype=tf.float32),mask))
+
         return accuracy
