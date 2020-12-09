@@ -133,6 +133,9 @@ def generate_sentence(sentence, vocab, model, sample_n=10):
         # Make it so highly likely and unhelpful words are not chosen
         np_word_logits[vocab["_s"]] = 0
         np_word_logits[stop_token] = 0
+        np_word_logits[vocab["the"]] = 0
+        np_word_logits[vocab["a"]] = 0
+        np_word_logits[vocab["of"]] = 0
 
         top_n = np.argsort(np_word_logits)[-sample_n:]
         n_logits = np.exp(np_word_logits[top_n])/np.exp(np_word_logits[top_n]).sum()
@@ -158,8 +161,11 @@ def main():
     print("accuracy: ")
     print(accuracy)
 
-    sentence = "He wrote eighteen poems on painting alone, more than any other Tang Poet."
+    sentence = "He wrote <NUM> poem _s on painting alone, more than any other <UNK> Poet."
     generate_sentence(sentence, dict, model)
+
+    sentence2 = "<UNK> announce _ed she would not seek election to the wisconsin supreme court"
+    generate_sentence(sentence2, dict, model)
 
 
 if __name__ == '__main__':
